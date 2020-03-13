@@ -1,4 +1,6 @@
+use libc::{off_t, size_t};
 use std::alloc::{GlobalAlloc, Layout, System};
+use std::os::raw::{c_int, c_void};
 
 /// Allocator whose backend is mmap(2)
 #[derive(Debug, Clone, Copy)]
@@ -18,6 +20,19 @@ unsafe impl GlobalAlloc for MmapAllocator {
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         System.dealloc(ptr, layout)
     }
+}
+
+extern "C" {
+    fn mmap(
+        addr: *mut c_void,
+        length: size_t,
+        prot: c_int,
+        flags: c_int,
+        fd: c_int,
+        offset: off_t,
+    ) -> *mut c_void;
+
+    fn munmap(addr: *mut c_void, length: size_t);
 }
 
 #[cfg(test)]
