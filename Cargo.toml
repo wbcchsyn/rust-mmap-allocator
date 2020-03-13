@@ -16,3 +16,7 @@ categories = ["memory-management"]
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2.67"
+
+[badges]
+circle-ci = { repository = "wbcchsyn/rust-allocators" }
+travis-ci = { repository = "wbcchsyn/rust-allocators" }
