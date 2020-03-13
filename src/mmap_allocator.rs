@@ -53,6 +53,11 @@ unsafe impl GlobalAlloc for MmapAllocator {
 
         munmap(addr, length);
     }
+
+    unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
+        // alloc() calls mmap() with the flags which always fills the memory 0.
+        self.alloc(layout)
+    }
 }
 
 extern "C" {
@@ -140,6 +145,22 @@ mod tests {
 
             assert_eq!(ptr::null(), alloc.alloc(layout));
             assert_ne!(ENOERR, errno());
+        }
+    }
+
+    #[test]
+    fn alloc_zeroed() {
+        unsafe {
+            type T = [u8; 1025];
+            let alloc = MmapAllocator::default();
+
+            let layout = Layout::new::<T>();
+            let ptr = alloc.alloc_zeroed(layout) as *const T;
+            let s: &[u8] = &*ptr;
+
+            for u in s {
+                assert_eq!(0, *u);
+            }
         }
     }
 }
