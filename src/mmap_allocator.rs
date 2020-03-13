@@ -109,4 +109,21 @@ mod tests {
             assert_ne!(ENOERR, errno());
         }
     }
+
+    #[test]
+    fn allocate_zero_size() {
+        unsafe {
+            clear_errno();
+
+            type T = String;
+            let alloc = MmapAllocator::default();
+
+            let align = mem::align_of::<T>();
+            let size = 0;
+            let layout = Layout::from_size_align(size, align).unwrap();
+
+            assert_eq!(ptr::null(), alloc.alloc(layout));
+            assert_ne!(ENOERR, errno());
+        }
+    }
 }
