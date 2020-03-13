@@ -13,17 +13,33 @@ impl Default for MmapAllocator {
     }
 }
 
+/// # Portability
+///
+/// alloc() calls mmap() with flag MAP_ANONYMOUS.
+/// Many systems support the flag, however, it is not specified in POSIX.
+///
+/// # Safety
+///
+/// All functions are thread safe.
+///
+/// # Error
+///
+/// Each function don't cause panic but set OS errno on error.
+///
+/// Note that it is not an error to deallocate pointer which is not allocated.
+/// This is the spec of munmap(2). See `man 2 munmap` for details.
 unsafe impl GlobalAlloc for MmapAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let addr = ptr::null_mut::<c_void>();
         let length = layout.size() as size_t;
         let prot = libc::PROT_READ | libc::PROT_WRITE;
 
+        // No backend file.
         // MAP_UNINITIALIZED is not very common.
         // To make this module portable, don't use it.
-        let flags = libc::MAP_PRIVATE | libc::MAP_ANONYMOUS; // No backend file.
-        let fd: c_int = -1; // Should be -1 if flags == MAP_ANONYMOUS. See `man 2 mmap`
-        let offset: off_t = 0; // Should be 0 if flags == MAP_ANONYMOUS. See `man 2 mmap`
+        let flags = libc::MAP_PRIVATE | libc::MAP_ANONYMOUS;
+        let fd: c_int = -1; // Should be -1 if flags includes MAP_ANONYMOUS. See `man 2 mmap`
+        let offset: off_t = 0; // Should be 0 if flags includes MAP_ANONYMOUS. See `man 2 mmap`
 
         match mmap(addr, length, prot, flags, fd, offset) {
             libc::MAP_FAILED => ptr::null_mut::<u8>(),
