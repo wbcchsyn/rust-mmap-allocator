@@ -1,6 +1,7 @@
 use libc::{off_t, size_t};
-use std::alloc::{GlobalAlloc, Layout, System};
+use std::alloc::{GlobalAlloc, Layout};
 use std::os::raw::{c_int, c_void};
+use std::ptr;
 
 /// Allocator whose backend is mmap(2)
 #[derive(Debug, Clone, Copy)]
@@ -14,11 +15,27 @@ impl Default for MmapAllocator {
 
 unsafe impl GlobalAlloc for MmapAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        System.alloc(layout)
+        let addr = ptr::null_mut::<c_void>();
+        let length = layout.size() as size_t;
+        let prot = libc::PROT_READ | libc::PROT_WRITE;
+
+        // MAP_UNINITIALIZED is not very common.
+        // To make this module portable, don't use it.
+        let flags = libc::MAP_PRIVATE | libc::MAP_ANONYMOUS; // No backend file.
+        let fd: c_int = -1; // Should be -1 if flags == MAP_ANONYMOUS. See `man 2 mmap`
+        let offset: off_t = 0; // Should be 0 if flags == MAP_ANONYMOUS. See `man 2 mmap`
+
+        match mmap(addr, length, prot, flags, fd, offset) {
+            libc::MAP_FAILED => ptr::null_mut::<u8>(),
+            ret => ret as *mut u8,
+        }
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        System.dealloc(ptr, layout)
+        let addr = ptr as *mut c_void;
+        let length = layout.size() as size_t;
+
+        munmap(addr, length);
     }
 }
 
@@ -40,6 +57,16 @@ mod tests {
     use super::*;
     use std::mem;
     use std::ptr;
+
+    const ENOERR: i32 = 0;
+
+    fn clear_errno() {
+        unsafe { *libc::__errno_location() = 0 }
+    }
+
+    fn errno() -> i32 {
+        unsafe { *libc::__errno_location() }
+    }
 
     #[test]
     fn default() {
@@ -69,6 +96,8 @@ mod tests {
     #[test]
     fn allocate_too_large() {
         unsafe {
+            clear_errno();
+
             type T = String;
             let alloc = MmapAllocator::default();
 
@@ -77,6 +106,7 @@ mod tests {
             let layout = Layout::from_size_align(size, align).unwrap();
 
             assert_eq!(ptr::null(), alloc.alloc(layout));
+            assert_ne!(ENOERR, errno());
         }
     }
 }
