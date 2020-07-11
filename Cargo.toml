@@ -1,22 +1,22 @@
 [package]
-name = "allocators"
+name = "mmap-allocator"
 version = "0.1.0"
 authors = ["Yoshida Shin <wbcchsyn@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-description = "structs implementing trait std::alloc::GlobalAlloc"
-repository = "https://github.com/wbcchsyn/rust-allocators.git"
+description = "struct implementing trait std::alloc::GlobalAlloc for unix"
+repository = "https://github.com/wbcchsyn/rust-mmap-allocator.git"
 license = "Apache-2.0 OR LGPL-3.0-or-later"
 readme = "README.md"
 
-keywords = ["alloc", "allocator", "memory"]
+keywords = ["alloc", "allocator", "memory", "GlobalAlloc"]
 categories = ["memory-management"]
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2.67"
 
 [badges]
-circle-ci = { repository = "wbcchsyn/rust-allocators" }
-travis-ci = { repository = "wbcchsyn/rust-allocators" }
+circle-ci = { repository = "wbcchsyn/rust-mmap-allocator" }
+travis-ci = { repository = "wbcchsyn/rust-mmap-allocator" }
