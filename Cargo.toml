@@ -6,7 +6,7 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-description = "structs implementing trait std::alloc::GlobalAlloc"
+description = "struct implementing trait std::alloc::GlobalAlloc for unix"
 repository = "https://github.com/wbcchsyn/rust-mmap-allocator.git"
 license = "Apache-2.0 OR LGPL-3.0-or-later"
 readme = "README.md"
