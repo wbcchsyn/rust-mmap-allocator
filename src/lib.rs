@@ -31,3 +31,5 @@
 
 #[cfg(unix)]
 pub mod mmap_allocator;
+
+pub use crate::mmap_allocator::MmapAllocator;
