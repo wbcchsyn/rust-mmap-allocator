@@ -30,6 +30,6 @@
 // limitations under the License.
 
 #[cfg(unix)]
-pub mod mmap_allocator;
+mod mmap_allocator;
 
 pub use crate::mmap_allocator::MmapAllocator;
