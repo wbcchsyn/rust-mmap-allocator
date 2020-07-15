@@ -34,7 +34,7 @@ use std::alloc::{GlobalAlloc, Layout};
 use std::os::raw::{c_int, c_void};
 use std::ptr;
 
-/// Allocator whose backend is mmap(2)
+/// Implementation of std::alloc::GlobalAlloc whose backend is mmap(2)
 #[derive(Debug, Clone, Copy)]
 pub struct MmapAllocator;
 
