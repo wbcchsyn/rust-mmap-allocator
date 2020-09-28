@@ -60,6 +60,9 @@ impl Default for MmapAllocator {
 /// Note that it is not an error to deallocate pointer which is not allocated.
 /// This is the spec of munmap(2). See `man 2 munmap` for details.
 unsafe impl GlobalAlloc for MmapAllocator {
+    /// # Panics
+    ///
+    /// This method can panic if the align of `layout` is greater than the kernel page align.
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         const ADDR: *mut c_void = ptr::null_mut::<c_void>();
         let length = layout.size() as size_t;
@@ -78,7 +81,7 @@ unsafe impl GlobalAlloc for MmapAllocator {
                 let ptr = ret as usize;
                 assert_eq!(0, ptr % layout.align());
                 ret as *mut u8
-            },
+            }
         }
     }
 
@@ -89,6 +92,9 @@ unsafe impl GlobalAlloc for MmapAllocator {
         munmap(addr, length);
     }
 
+    /// # Panics
+    ///
+    /// This method can panic if the align of `layout` is greater than the kernel page align.
     unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
         // alloc() calls mmap() with the flags which always fills the memory 0.
         self.alloc(layout)
@@ -242,7 +248,7 @@ mod tests {
             let ptr = alloc.realloc(ptr as *mut u8, layout, new_size) as *mut T;
             let layout = Layout::from_size_align(new_size, layout.align()).unwrap();
 
-            let ts = &mut * ptr;
+            let ts = &mut *ptr;
             for t in ts.iter_mut() {
                 assert_eq!(1, *t);
                 *t = 2;
