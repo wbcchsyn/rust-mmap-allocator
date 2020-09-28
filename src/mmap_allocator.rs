@@ -89,6 +89,19 @@ unsafe impl GlobalAlloc for MmapAllocator {
         // alloc() calls mmap() with the flags which always fills the memory 0.
         self.alloc(layout)
     }
+
+    #[cfg(linux)]
+    unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
+        let old_address = ptr as *mut c_void;
+        let old_size = layout.size() as size_t;
+        let new_size = new_size as size_t;
+        let FLAGS = libc::MREMAP_MAYMOVE;
+
+        match mremap(old_address, old_size, new_size, FLAGS) {
+            libc::MAP_FAILED => ptr::null_mut::<u8>(),
+            ret => ret as *mut u8,
+        }
+    }
 }
 
 extern "C" {
@@ -200,6 +213,70 @@ mod tests {
             for u in s {
                 assert_eq!(0, *u);
             }
+        }
+    }
+
+    #[test]
+    fn realloc() {
+        unsafe {
+            type T = [u8; 1025];
+            let alloc = MmapAllocator::default();
+
+            let layout = Layout::new::<T>();
+            let ptr = alloc.alloc(layout) as *mut T;
+
+            let ts = &mut *ptr;
+            for t in ts.iter_mut() {
+                *t = 1;
+            }
+
+            type U = (T, T);
+
+            let new_size = mem::size_of::<U>();
+            let ptr = alloc.realloc(ptr as *mut u8, layout, new_size) as *mut T;
+            let layout = Layout::from_size_align(new_size, layout.align()).unwrap();
+
+            let ts = &mut * ptr;
+            for t in ts.iter_mut() {
+                assert_eq!(1, *t);
+                *t = 2;
+            }
+
+            let new_size = mem::size_of::<u8>();
+            let ptr = alloc.realloc(ptr as *mut u8, layout, new_size);
+            let layout = Layout::from_size_align(new_size, layout.align()).unwrap();
+
+            assert_eq!(2, *ptr);
+
+            alloc.dealloc(ptr, layout);
+        }
+    }
+
+    #[test]
+    fn realloc_too_large() {
+        unsafe {
+            type T = [u8; 1025];
+            let alloc = MmapAllocator::default();
+
+            let layout = Layout::new::<T>();
+            let ptr = alloc.alloc(layout) as *mut T;
+
+            let ts = &mut *ptr;
+            for t in ts.iter_mut() {
+                *t = 1;
+            }
+
+            let new_size = std::usize::MAX - mem::size_of::<T>();
+            let new_ptr = alloc.realloc(ptr as *mut u8, layout, new_size);
+
+            assert!(new_ptr.is_null());
+            assert_ne!(ENOERR, errno());
+
+            for t in ts.iter() {
+                assert_eq!(1, *t);
+            }
+
+            alloc.dealloc(ptr as *mut u8, layout);
         }
     }
 }
