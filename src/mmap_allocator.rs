@@ -207,12 +207,14 @@ mod tests {
             let alloc = MmapAllocator::default();
 
             let layout = Layout::new::<T>();
-            let ptr = alloc.alloc_zeroed(layout) as *const T;
+            let ptr = alloc.alloc_zeroed(layout) as *mut T;
             let s: &[u8] = &*ptr;
 
             for u in s {
                 assert_eq!(0, *u);
             }
+
+            alloc.dealloc(ptr as *mut u8, layout);
         }
     }
 
