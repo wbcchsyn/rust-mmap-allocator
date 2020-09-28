@@ -74,7 +74,11 @@ unsafe impl GlobalAlloc for MmapAllocator {
 
         match mmap(ADDR, length, PROT, FLAGS, FD, OFFSET) {
             libc::MAP_FAILED => ptr::null_mut::<u8>(),
-            ret => ret as *mut u8,
+            ret => {
+                let ptr = ret as usize;
+                assert_eq!(0, ptr % layout.align());
+                ret as *mut u8
+            },
         }
     }
 
