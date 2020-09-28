@@ -102,6 +102,14 @@ extern "C" {
     ) -> *mut c_void;
 
     fn munmap(addr: *mut c_void, length: size_t);
+
+    #[cfg(linux)]
+    fn mremap(
+        old_address: *mut c_void,
+        old_size: size_t,
+        new_size: size_t,
+        flags: c_int,
+    ) -> *mut c_void;
 }
 
 #[cfg(test)]
