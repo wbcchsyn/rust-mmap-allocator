@@ -15,7 +15,7 @@ keywords = ["alloc", "allocator", "memory", "GlobalAlloc"]
 categories = ["memory-management"]
 
 [target.'cfg(unix)'.dependencies]
-libc = "0.2.67"
+libc = "0.2"
 
 [badges]
 circle-ci = { repository = "wbcchsyn/rust-mmap-allocator" }
