@@ -39,7 +39,16 @@ use std::ptr;
 pub struct MmapAllocator;
 
 impl Default for MmapAllocator {
+    #[inline]
     fn default() -> Self {
+        Self
+    }
+}
+
+impl MmapAllocator {
+    /// Creates a new instance.
+    #[inline]
+    pub const fn new() -> Self {
         Self
     }
 }
@@ -63,6 +72,7 @@ unsafe impl GlobalAlloc for MmapAllocator {
     /// # Panics
     ///
     /// This method can panic if the align of `layout` is greater than the kernel page align.
+    #[inline]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         const ADDR: *mut c_void = ptr::null_mut::<c_void>();
         let length = layout.size() as size_t;
@@ -85,6 +95,7 @@ unsafe impl GlobalAlloc for MmapAllocator {
         }
     }
 
+    #[inline]
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let addr = ptr as *mut c_void;
         let length = layout.size() as size_t;
@@ -95,12 +106,14 @@ unsafe impl GlobalAlloc for MmapAllocator {
     /// # Panics
     ///
     /// This method can panic if the align of `layout` is greater than the kernel page align.
+    #[inline]
     unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
         // alloc() calls mmap() with the flags which always fills the memory 0.
         self.alloc(layout)
     }
 
     #[cfg(linux)]
+    #[inline]
     unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
         let old_address = ptr as *mut c_void;
         let old_size = layout.size() as size_t;
