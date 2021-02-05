@@ -1,4 +1,4 @@
-// Copyright 2020 Shin Yoshida
+// Copyright 2020,2021 Shin Yoshida
 //
 // This is part of rust-mmap-allocator
 //
@@ -28,6 +28,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+//! Declare struct `MmapAllocator` implementing `std::alloc::GlobalAlloc` whose backend is
+//! 'posix mmap()'.
+//!
+//! This crate is only for 'unix' or 'linux' platform.
 
 #[cfg(unix)]
 mod mmap_allocator;
