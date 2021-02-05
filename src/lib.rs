@@ -29,6 +29,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Declare struct `MmapAllocator` implementing `std::alloc::GlobalAlloc` whose backend is
+//! 'posix mmap()'.
+//!
+//! This crate is only for 'unix' or 'linux' platform.
+
 #[cfg(unix)]
 mod mmap_allocator;
 
