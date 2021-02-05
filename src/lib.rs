@@ -1,4 +1,4 @@
-// Copyright 2020 Shin Yoshida
+// Copyright 2020,2021 Shin Yoshida
 //
 // This is part of rust-mmap-allocator
 //
