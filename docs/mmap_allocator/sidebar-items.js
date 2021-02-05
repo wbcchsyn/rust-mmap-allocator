@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MmapAllocator","Implementation of std::alloc::GlobalAlloc whose backend is mmap(2)"]]});
