@@ -44,6 +44,13 @@ impl Default for MmapAllocator {
     }
 }
 
+impl MmapAllocator {
+    /// Creates a new instance.
+    pub const fn new() -> Self {
+        Self
+    }
+}
+
 /// # Portability
 ///
 /// alloc() calls mmap() with flag MAP_ANONYMOUS.
