@@ -13,6 +13,7 @@ readme = "README.md"
 
 keywords = ["alloc", "allocator", "memory", "GlobalAlloc"]
 categories = ["memory-management"]
+documentation = "https://wbcchsyn.github.io/rust-mmap-allocator/mmap_allocator/index.html"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
