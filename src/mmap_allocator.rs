@@ -72,7 +72,9 @@ impl MmapAllocator {
 unsafe impl GlobalAlloc for MmapAllocator {
     /// # Panics
     ///
-    /// This method can panic if the align of `layout` is greater than the kernel page align.
+    /// This method may panic if the align of `layout` is greater than the kernel page align.
+    /// (Basically, kernel page align is always greater than the align of `layout` that rust
+    /// generates unless the programer dares to build such a `layout` on purpose.)
     #[inline]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         const ADDR: *mut c_void = ptr::null_mut::<c_void>();
@@ -312,6 +314,8 @@ thread_local! {
 }
 
 /// Returns OS Page Size.
+///
+/// See crate document for details.
 #[inline]
 pub fn page_size() -> usize {
     PAGE_SIZE.with(|s| match s.get() {

@@ -41,8 +41,13 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2020 Shin Yoshida</span>
+<span class="comment">// Copyright 2020,2021 Shin Yoshida</span>
 <span class="comment">//</span>
 <span class="comment">// This is part of rust-mmap-allocator</span>
 <span class="comment">//</span>
@@ -73,14 +78,19 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="doccomment">//! Declare struct `MmapAllocator` implementing `std::alloc::GlobalAlloc` whose backend is</span>
-<span class="doccomment">//! &#39;posix mmap()&#39;.</span>
+<span class="doccomment">//! `mmap-allocator` declares struct `MmapAllocator` and function &#39;page\_size&#39; for &#39;unix&#39; or &#39;linux&#39; platform.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This crate is only for &#39;unix&#39; or &#39;linux&#39; platform.</span>
+<span class="doccomment">//! `MmapAllocator` implements `std::alloc::GlobalAlloc` whose backend is &#39;posix mmap&#39;.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! &#39;page\_size&#39; returns OS page size.</span>
+<span class="doccomment">//! (&#39;unix&#39; and &#39;linux&#39; os pass memory to a process by multipile of page size; if a process</span>
+<span class="doccomment">//! requires 32 bytes heap memory and if the OS page size is 4096 bytes, OS passes 4096 bytes</span>
+<span class="doccomment">//! memory chunk. Usually &#39;malloc&#39; deals it to use memory effectively.)</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">mod</span> <span class="ident">mmap_allocator</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">mmap_allocator</span>::<span class="ident">MmapAllocator</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">mmap_allocator</span>::{<span class="ident">page_size</span>, <span class="ident">MmapAllocator</span>};
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "mmap_allocator";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
