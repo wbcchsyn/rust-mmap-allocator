@@ -32,7 +32,7 @@
 use libc::{off_t, size_t};
 use std::alloc::{GlobalAlloc, Layout};
 use std::cell::Cell;
-use std::os::raw::{c_int, c_void};
+use std::os::raw::{c_int, c_long, c_void};
 use std::ptr;
 
 /// Implementation of std::alloc::GlobalAlloc whose backend is mmap(2)
@@ -309,4 +309,21 @@ mod tests {
 
 thread_local! {
     static PAGE_SIZE: Cell<usize> = Cell::new(0);
+}
+
+/// Returns OS Page Size.
+#[inline]
+pub fn page_size() -> usize {
+    PAGE_SIZE.with(|s| match s.get() {
+        0 => {
+            let ret = unsafe { sysconf(libc::_SC_PAGE_SIZE) as usize };
+            s.set(ret);
+            ret
+        }
+        ret => ret,
+    })
+}
+
+extern "C" {
+    fn sysconf(name: c_int) -> c_long;
 }
