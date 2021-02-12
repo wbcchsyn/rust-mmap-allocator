@@ -37,4 +37,4 @@
 #[cfg(unix)]
 mod mmap_allocator;
 
-pub use crate::mmap_allocator::MmapAllocator;
+pub use crate::mmap_allocator::{page_size, MmapAllocator};
