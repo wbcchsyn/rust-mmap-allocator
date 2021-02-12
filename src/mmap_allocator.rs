@@ -31,6 +31,7 @@
 
 use libc::{off_t, size_t};
 use std::alloc::{GlobalAlloc, Layout};
+use std::cell::Cell;
 use std::os::raw::{c_int, c_void};
 use std::ptr;
 
@@ -304,4 +305,8 @@ mod tests {
             alloc.dealloc(ptr as *mut u8, layout);
         }
     }
+}
+
+thread_local! {
+    static PAGE_SIZE: Cell<usize> = Cell::new(0);
 }
