@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["MmapAllocator","Implementation of std::alloc::GlobalAlloc whose backend is mmap(2)"]]});
+initSidebarItems({"fn":[["page_size","Returns OS Page Size."]],"struct":[["MmapAllocator","Implementation of std::alloc::GlobalAlloc whose backend is mmap(2)"]]});
