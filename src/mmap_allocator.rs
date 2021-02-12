@@ -312,6 +312,8 @@ thread_local! {
 }
 
 /// Returns OS Page Size.
+///
+/// See crate document for details.
 #[inline]
 pub fn page_size() -> usize {
     PAGE_SIZE.with(|s| match s.get() {
